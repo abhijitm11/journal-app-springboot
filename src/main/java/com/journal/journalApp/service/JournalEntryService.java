@@ -13,7 +13,7 @@ public interface JournalEntryService {
 
     JournalEntry getJournalEntryById(ObjectId id);
 
-    void deleteJournalEntryById(String username, ObjectId myId);
+    boolean deleteJournalEntryById(String username, ObjectId myId);
 
     JournalEntry saveEntry(JournalEntry oldEntry);
 }

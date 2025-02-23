@@ -57,23 +57,21 @@ public class JournalEntryServiceImpl implements JournalEntryService {
     }
 
     @Override
-    public void deleteJournalEntryById(String username, ObjectId journalId) {
+    @Transactional
+    public boolean deleteJournalEntryById(String username, ObjectId journalId) {
+        boolean deleted = false;
         try {
-            Optional<User> user = Optional.ofNullable(userService.getUserByUsername(username));
+            User user = userService.getUserByUsername(username);
             Optional<JournalEntry> entry = journalEntryRepository.findById(journalId);
-            if(user.isEmpty() || entry.isEmpty()) {
-                throw new IllegalArgumentException();
+            deleted = user.getJournalEntries().removeIf(x -> x.getId().equals(journalId));
+            if(deleted) {
+                userService.saveUser(user);
+                journalEntryRepository.deleteById(journalId);
             }
-
-            user.get().getJournalEntries().removeIf(x -> x.getId().equals(journalId));
-            userService.saveUser(user.get());
-
-            journalEntryRepository.deleteById(journalId);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        return deleted;
     }
-
-
 
 }

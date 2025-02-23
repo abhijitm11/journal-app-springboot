@@ -51,7 +51,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUserById(ObjectId myId) {
         userRepository.deleteById(myId);
-
     }
 
     @Override
@@ -62,5 +61,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(String username) {
         userRepository.deleteByUsername(username);
+    }
+
+    @Override
+    public User saveAdmin(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(List.of("USER", "ADMIN"));
+        return userRepository.save(user);
     }
 }

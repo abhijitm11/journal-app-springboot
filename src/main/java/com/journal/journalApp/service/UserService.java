@@ -21,4 +21,6 @@ public interface UserService {
     User getUserByUsername(@NonNull String username);
 
     void deleteUser(String username);
+
+    User saveAdmin(User user);
 }

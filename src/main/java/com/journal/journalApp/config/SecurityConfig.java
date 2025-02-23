@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                 .requestMatchers("/journalEntry/**", "/users/**").authenticated() // Restricted URLs
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll() // Allow other URLs
         ).httpBasic(Customizer.withDefaults()); // HTTP Basic Authentication
 

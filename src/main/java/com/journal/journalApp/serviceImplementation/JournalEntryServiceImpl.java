@@ -7,6 +7,8 @@ import java.util.Optional;
 import com.journal.journalApp.entity.User;
 import com.journal.journalApp.service.UserService;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,8 @@ public class JournalEntryServiceImpl implements JournalEntryService {
     @Autowired
     private UserService userService;
 
+    private static final Logger LOG = LoggerFactory.getLogger(JournalEntryServiceImpl.class);
+
     @Override
     @Transactional
     public JournalEntry saveEntry(JournalEntry journalEntry, String username) {
@@ -31,7 +35,7 @@ public class JournalEntryServiceImpl implements JournalEntryService {
             User user = userService.getUserByUsername(username);
             journalEntry.setCreationDate(LocalDateTime.now());
             JournalEntry saved = journalEntryRepository.save(journalEntry);
-
+            LOG.info("Saved Journal: {}", saved.getTitle());
             user.getJournalEntries().add(saved);
             userService.saveUser(user);
             return saved;

@@ -6,6 +6,7 @@ import com.journal.journalApp.serviceImplementation.WeatherServiceImpl;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.util.Map;
 @Component
 @Data
 @NoArgsConstructor
+@Slf4j
 public class AppCache {
 
     @Autowired
@@ -25,10 +27,9 @@ public class AppCache {
 
     private Map<String, String> appCache;
 
-    private static final Logger LOG = LoggerFactory.getLogger(AppCache.class);
-
     @PostConstruct
     public void init() {
+        log.info("Cron job started for clearing cache!");
         appCache = new HashMap<>();
         List<JournalConfig> all = journalConfigRepository.findAll();
         for(JournalConfig journalConfig: all) {

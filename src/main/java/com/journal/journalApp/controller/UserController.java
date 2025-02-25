@@ -66,4 +66,11 @@ public class UserController {
         return new ResponseEntity<>("Hi "+authentication.getName()+greetings, HttpStatus.OK);
     }
 
+    @GetMapping("/users-for-sa")
+    public ResponseEntity<List<User>> findUsersForSentimentAnalysis() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        List<User> users= userService.findUsersForSA();
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
 }

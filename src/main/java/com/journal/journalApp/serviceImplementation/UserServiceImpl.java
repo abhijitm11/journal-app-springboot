@@ -6,8 +6,12 @@ import com.journal.journalApp.repository.UserRepository;
 import com.journal.journalApp.service.UserService;
 
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +20,7 @@ import java.util.Optional;
 
 
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -23,6 +28,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    MongoTemplate mongoTemplate;
 
 
     @Override
@@ -69,4 +77,20 @@ public class UserServiceImpl implements UserService {
         user.setRoles(List.of("USER", "ADMIN"));
         return userRepository.save(user);
     }
+
+    /*@Override
+    public List<User> findUsersForSA() {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+        List<User> users =  userRepository.findBySentimentAnalysisTrueAndEmailRegex(emailRegex);
+        return users;
+    }*/
+
+    @Override
+    public List<User> findUsersForSA() {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("email").regex("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,6}$"));
+        query.addCriteria(Criteria.where("sentimentAnalysis").is(true));
+        return mongoTemplate.find(query, User.class);
+    }
+
 }

@@ -23,4 +23,6 @@ public interface UserService {
     void deleteUser(String username);
 
     User saveAdmin(User user);
+
+    List<User> findUsersForSA();
 }

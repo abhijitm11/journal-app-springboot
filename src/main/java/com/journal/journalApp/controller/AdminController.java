@@ -1,5 +1,6 @@
 package com.journal.journalApp.controller;
 
+import com.journal.journalApp.cache.AppCache;
 import com.journal.journalApp.entity.User;
 import com.journal.journalApp.repository.UserRepository;
 import com.journal.journalApp.service.UserService;
@@ -18,6 +19,8 @@ public class AdminController {
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AppCache appCache;
 
     @GetMapping("/all-users")
     public ResponseEntity<?> getAllUsers() {
@@ -32,6 +35,11 @@ public class AdminController {
     public ResponseEntity<?> createAdmin(@RequestBody User user) {
         User admin = userService.saveAdmin(user);
         return new ResponseEntity<>(admin, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/clear-app-cache")
+    public void clearAppCache() {
+        appCache.init();
     }
 
 }

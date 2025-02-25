@@ -2,6 +2,7 @@ package com.journal.journalApp.entity;
 
 import java.time.LocalDateTime;
 
+import com.journal.journalApp.constants.Sentiment;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import org.bson.types.ObjectId;
@@ -21,4 +22,5 @@ public class JournalEntry {
     private String title;
     private String content;
     private LocalDateTime creationDate;
+    private Sentiment sentiment;
 }

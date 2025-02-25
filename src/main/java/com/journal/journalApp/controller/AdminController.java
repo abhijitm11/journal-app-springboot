@@ -7,6 +7,8 @@ import com.journal.journalApp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,6 +42,12 @@ public class AdminController {
     @GetMapping("/clear-app-cache")
     public void clearAppCache() {
         appCache.init();
+    }
+
+    @GetMapping("/users-for-sa")
+    public ResponseEntity<List<User>> findUsersForSentimentAnalysis() {
+        List<User> users= userService.findUsersForSA();
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
 }

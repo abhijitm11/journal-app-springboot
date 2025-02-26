@@ -3,12 +3,14 @@ package com.journal.journalApp.serviceImplementation;
 import com.journal.journalApp.cache.AppCache;
 import com.journal.journalApp.constants.Keys;
 import com.journal.journalApp.response.WeatherResponse;
+import com.journal.journalApp.service.RedisServiceImpl;
 import com.journal.journalApp.service.WeatherService;
 import com.journal.journalApp.utils.JournalUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -23,6 +25,9 @@ public class WeatherServiceImpl implements WeatherService {
     @Autowired
     private AppCache appCache;
 
+    @Autowired
+    private RedisServiceImpl redisService;
+
     private static final String API = "https://open-weather13.p.rapidapi.com/city/<city>/EN";
     private static final String HOST = "open-weather13.p.rapidapi.com";
 
@@ -35,6 +40,12 @@ public class WeatherServiceImpl implements WeatherService {
 
     @Override
     public WeatherResponse getWeather(String city) {
+        WeatherResponse weatherResponse = redisService.get(city, WeatherResponse.class);
+        if(weatherResponse != null) {
+            // when key is present in redis
+            return weatherResponse;
+        }
+        // when kei is not present in redis
         // Define the URL for the API endpoint
         String finalUrl = API.replace("<city>", city);
 
@@ -49,8 +60,10 @@ public class WeatherServiceImpl implements WeatherService {
         // Make the GET request and get the response as a String
         ResponseEntity<WeatherResponse> response = restTemplate.exchange(finalUrl, HttpMethod.GET, entity, WeatherResponse.class);
 
-        // Return the response body (weather data in this case)
-        return response.getBody();
-
+        WeatherResponse body = response.getBody();
+        if(body !=null) {
+            redisService.set(city, body, 300L);
+        }
+        return body;
     }
 }

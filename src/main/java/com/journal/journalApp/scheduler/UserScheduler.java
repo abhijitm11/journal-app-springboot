@@ -39,7 +39,7 @@ public class UserScheduler {
     private KafkaTemplate<String, SentimentData> kafkaTemplate;
 
     // @Scheduled(cron = "0 0 9 * * Sun")
-    @Scheduled(cron = "0 */2 * * * *")
+    @Scheduled(cron = "0 */45 * * * *")
     public void fetchUsersAndSendSentimentMail() {
         List<User> usersForSA = userService.findUsersForSA();
         for(User user: usersForSA) {
@@ -67,8 +67,13 @@ public class UserScheduler {
             if(mostFrequentSentiment != null) {
                 // log.info("Sentiment for user: {} is: {}", user, mostFrequentSentiment.toString());
                 // emailService.sendMail(user.getEmail(), "Sentiment Analysis for last week!", mostFrequentSentiment.toString());
-                SentimentData sentimentData = SentimentData.builder().email(user.getEmail()).sentiment(mostFrequentSentiment.toString()).build();
-                kafkaTemplate.send("weekly-sentiment", user.getEmail(), sentimentData);
+                try {
+                    SentimentData sentimentData = SentimentData.builder().email(user.getEmail()).sentiment(mostFrequentSentiment.toString()).build();
+                    kafkaTemplate.send("weekly-sentiment", user.getEmail(), sentimentData);
+                } catch (Exception e) {
+                    log.info("Kafka Fallback!", e);
+                    //emailService.sendMail(sentimentData.getEmail(), "Sentiment for past week!", sentimentData.getSentiment());
+                }
             }
 
         }
